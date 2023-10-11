@@ -24,7 +24,7 @@ fn try_stack_argument(ctx: ProbeContext) -> Result<i32, i64> {
             break;
         }
         if stack {
-            let _ = ARGS.insert(&arg, &ctx.arg(arg as usize).ok_or(255)?, 0);
+            let _ = ARGS.insert(&arg, &ctx.stack_arg(arg as usize).ok_or(255)?, 0);
         } else {
             let arg_v: Option<u64> = ctx.arg(arg as usize);
             if arg_v.is_none() {

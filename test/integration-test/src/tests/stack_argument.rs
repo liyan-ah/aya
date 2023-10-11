@@ -16,7 +16,8 @@ pub extern "C" fn trigger_stack_argument(
     // Notice that other languages, like Golang, or in other archs, like aarch64, may
     // have different convention rules.
     _a_6: u64,
-    _a_7: i64,
+    _a_7: u64,
+    // maybe more types, like pointer and signed integer, could be added.
 ) {
     core::hint::black_box(trigger_stack_argument);
 }
@@ -38,7 +39,7 @@ async fn stack_argument() {
 
     assert_eq!(args_map.keys().count(), 8);
     for iter in args_map.iter() {
-        let iter_v = iter.unwrap();
-        assert_eq!(iter_v.0 as u64, iter_v.1);
+        let (key, value) = iter.unwrap();
+        assert_eq!(key as u64, value);
     }
 }
