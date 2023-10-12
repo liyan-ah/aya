@@ -19,31 +19,33 @@ pub fn test_stack_argument(ctx: ProbeContext) -> i32 {
 fn try_stack_argument(ctx: ProbeContext) -> Result<i32, i64> {
     let mut stack = false;
     let mut arg = 0;
+    let mut start = 0;
     loop {
         if arg > 7 {
             break;
         }
         if stack {
-            let _ = ARGS.insert(&arg, &ctx.stack_arg(arg as usize).ok_or(255)?, 0);
+            let key = arg as u32;
+            let value = ctx.stack_arg((arg - start) as usize).ok_or(255)?;
+            if let Err(_) = ARGS.insert(&key, &value, 0) {
+                return Err(255);
+            }
         } else {
             let arg_v: Option<u64> = ctx.arg(arg as usize);
             if arg_v.is_none() {
                 // assume that we shall read from stack now.
                 stack = true;
+                start = arg;
                 continue;
             }
-            let _ = ARGS.insert(&arg, &arg_v.ok_or(255)?, 0);
+            let key = arg as u32;
+            let value = arg_v.ok_or(255)?;
+            if let Err(_) = ARGS.insert(&key, &value, 0) {
+                return Err(255);
+            }
         }
         arg += 1;
     }
-    let _ = ARGS.insert(&0, &ctx.arg(0).ok_or(255)?, 0);
-    let _ = ARGS.insert(&1, &ctx.arg(1).ok_or(255)?, 0);
-    let _ = ARGS.insert(&2, &ctx.arg(2).ok_or(255)?, 0);
-    let _ = ARGS.insert(&3, &ctx.arg(3).ok_or(255)?, 0);
-    let _ = ARGS.insert(&4, &ctx.arg(4).ok_or(255)?, 0);
-    let _ = ARGS.insert(&5, &ctx.arg(5).ok_or(255)?, 0);
-    let _ = ARGS.insert(&6, &ctx.stack_arg(0).ok_or(255)?, 0);
-    let _ = ARGS.insert(&7, &ctx.stack_arg(1).ok_or(255)?, 0);
 
     Ok(0)
 }
